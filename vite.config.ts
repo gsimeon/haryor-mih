@@ -4,10 +4,12 @@ import path from 'path';
 import {defineConfig} from 'vite';
 
 export default defineConfig(({ command }) => {
-  // Use root '/' for local dev, and '/haryor-mih/' for GitHub Pages production builds.
-  // Can be customized with VITE_BASE environment variable if needed.
-  const repoBase = process.env.VITE_BASE || (process.env.GITHUB_REPOSITORY ? `/${process.env.GITHUB_REPOSITORY.split('/')[1]}/` : '/haryor-mih/');
-  const base = command === 'serve' ? '/' : repoBase;
+  // Use root '/' for local dev, and dynamic/configured base for GitHub Pages production builds
+  let rawBase = process.env.VITE_BASE || (process.env.GITHUB_REPOSITORY ? `/${process.env.GITHUB_REPOSITORY.split('/')[1]}/` : '/haryor-mih/');
+  rawBase = rawBase.replace(/\/+/g, '/');
+  if (!rawBase.endsWith('/')) rawBase += '/';
+  if (!rawBase.startsWith('/')) rawBase = '/' + rawBase;
+  const base = command === 'serve' ? '/' : rawBase;
 
   return {
     base,
