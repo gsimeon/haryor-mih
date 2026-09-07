@@ -137,10 +137,54 @@ const CURRENCY_RATES: Record<Currency, number> = {
   EUR: 1 / 1700,
 };
 
+// Helper to extract the relative base path for GitHub Pages or root domains
+const getAppBasePath = (): string => {
+  let base = (import.meta as unknown as { env?: { BASE_URL?: string } }).env?.BASE_URL || '/';
+  if (!base.startsWith('/')) base = '/' + base;
+  if (!base.endsWith('/')) base = base + '/';
+  return base;
+};
+
+// Extracts internal route (e.g. '/track', '/quote') relative to repository path
+const extractRouteFromUrl = (): string => {
+  try {
+    const base = getAppBasePath();
+    const pathname = window.location.pathname;
+
+    // Check if redirect query exists: ?/track or ?/quote
+    if (window.location.search && window.location.search.startsWith('?/')) {
+      const queryRoute = window.location.search.slice(1).split('&')[0];
+      if (queryRoute) return queryRoute.startsWith('/') ? queryRoute : `/${queryRoute}`;
+    }
+
+    if (base !== '/' && pathname.startsWith(base)) {
+      const sub = pathname.slice(base.length - 1);
+      return sub || '/';
+    } else if (base !== '/' && pathname === base.slice(0, -1)) {
+      return '/';
+    }
+
+    return pathname || '/';
+  } catch {
+    return '/';
+  }
+};
+
 export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  // Navigation state
-  const [currentRoute, setCurrentRoute] = useState<string>('/');
+  // Navigation state initialized relative to repository path
+  const [currentRoute, setCurrentRoute] = useState<string>(() => extractRouteFromUrl());
   const [routeParams, setRouteParams] = useState<Record<string, string>>({});
+
+  // Synchronize browser history and popstate events relative to repo path
+  useEffect(() => {
+    const handlePopState = () => {
+      const route = extractRouteFromUrl();
+      setCurrentRoute(route);
+    };
+
+    window.addEventListener('popstate', handlePopState);
+    return () => window.removeEventListener('popstate', handlePopState);
+  }, []);
 
   // User state
   const [currentUser, setCurrentUser] = useState<User | null>(() => {
@@ -297,10 +341,26 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     setToasts((prev) => prev.filter((t) => t.id !== id));
   };
 
-  // Navigation
+  // Navigation relative to the repository path
   const navigateTo = (route: string, params: Record<string, string> = {}) => {
     setCurrentRoute(route);
     setRouteParams(params);
+
+    try {
+      const base = getAppBasePath();
+      const cleanRoute = route.startsWith('/') ? route.slice(1) : route;
+      const fullPath = base === '/' ? `/${cleanRoute}` : `${base}${cleanRoute}`;
+
+      const searchParams = new URLSearchParams(params).toString();
+      const urlToPush = searchParams ? `${fullPath}?${searchParams}` : fullPath;
+
+      if (window.location.pathname + window.location.search !== urlToPush) {
+        window.history.pushState(params, '', urlToPush);
+      }
+    } catch {
+      // In restricted iframe environments, pushState failure is safely caught
+    }
+
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
