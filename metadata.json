@@ -1,0 +1,6 @@
+{
+  "name": "Haryor-Mih Global - Logistics & AutoTrade Platform",
+  "description": "Enterprise digital logistics and autotrade platform for Haryor-Mih International Logistics Services Ltd., featuring quote management, shipment tracking, customer portal, and operations dashboard.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
