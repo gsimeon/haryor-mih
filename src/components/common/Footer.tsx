@@ -35,7 +35,7 @@ export const Footer: React.FC = () => {
                   HARYOR-MIH
                 </div>
                 <div className="text-[10px] text-[#FF8500] font-bold tracking-widest uppercase">
-                  INTERNATIONAL LOGISTICS SERVICES LTD.
+                  INTERNATIONAL LOGISTICS SERVICES LTD
                 </div>
               </div>
             </div>

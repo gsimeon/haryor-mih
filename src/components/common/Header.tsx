@@ -348,8 +348,8 @@ export const Header: React.FC = () => {
               <div className="font-extrabold text-white tracking-wider text-base sm:text-lg leading-tight uppercase font-['Montserrat']">
                 HARYOR-MIH
               </div>
-              <div className="text-[9px] sm:text-[10px] text-[#FF8500] font-bold tracking-widest uppercase">
-                GLOBAL LOGISTICS &amp; AUTOTRADE
+              <div className="text-[8px] sm:text-[9.5px] text-[#FF8500] font-bold tracking-wider uppercase leading-none mt-0.5 whitespace-nowrap">
+                INTERNATIONAL LOGISTICS SERVICES LTD
               </div>
             </div>
           </button>
